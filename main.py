@@ -84,8 +84,10 @@ def start():
         return 'Instance is running...', 200
     if request.method == 'POST':
         gh_event = request.headers.get('x-github-event', default=None)
+        LOGGER.info(f'gh_event value is {gh_event}')
         if gh_event is not None and gh_event == 'workflow_job':
             action = request.json['action']
+            LOGGER.info(f'action value is {action}')
             if action == 'queued':
                 setup()
                 run()
