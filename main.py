@@ -85,7 +85,10 @@ def start():
     if request.method == 'POST':
         gh_event = request.headers.get('x-github-event', default=None)
         LOGGER.info(f'gh_event value is {gh_event}')
+        LOGGER.info(f'gh_event is not None evaluates to {gh_event is not None}')
+        LOGGER.info(f"gh_event == 'workflow_job' evaluates to {gh_event == 'workflow_job'}")
         if gh_event is not None and gh_event == 'workflow_job':
+            LOGGER.info('inside the if condition')
             req_body = request.get_json()
             LOGGER.info(req_body)
             action = req_body['action']
