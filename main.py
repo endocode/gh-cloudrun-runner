@@ -49,7 +49,10 @@ def check_system():
 def get_token():
     registration_token_url = f'https://api.github.com/orgs/{organization}/actions/runners/registration-token'
     headers = {'authorization': f'token ${token}', 'Accept': 'application/vnd.github.v3+json'}
+    LOGGER.info(f'sending a post request to {registration_token_url}')
     response = requests.post(url=registration_token_url, headers=headers)
+    LOGGER.info(response.status_code)
+    LOGGER.info(response.text)
     if response.status_code == 201:
         response_json = json.loads(response.text)
         return response_json['token']
