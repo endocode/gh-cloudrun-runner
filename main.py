@@ -58,7 +58,7 @@ def get_token():
 def cleanup():
     LOGGER.info('cleaning up the instance...')
     global reg_token
-    cleanup_call = subprocess.run(['./config.sh', 'remove', '--token', f'{reg_token}'],
+    cleanup_call = subprocess.run(['./config.sh remove --token "{reg_token}"'],
                                   shell=True, stdout=subprocess.PIPE)
     LOGGER.info(cleanup_call.stdout)
     reg_token = None
@@ -70,9 +70,7 @@ def setup():
     runner_name_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
     global reg_token
     reg_token = get_token()
-    setup_call = subprocess.run(['./config.sh', '--url', organization_url, '--token', reg_token, '--name',
-                                 runner_name_prefix + runner_name_suffix, '--unattended', '--ephemeral',
-                                 '--work', '_work'], shell=True, stdout=subprocess.PIPE)
+    setup_call = subprocess.run([f'./config.sh --url "{organization_url}" --token "{reg_token}" --name "{runner_name_prefix + runner_name_suffix}" --unattended --ephemeral --work _work'], shell=True, stdout=subprocess.PIPE)
     LOGGER.info(setup_call.stdout)
 
 
