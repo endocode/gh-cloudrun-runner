@@ -89,7 +89,7 @@ def start():
         LOGGER.info(f"gh_event == 'workflow_job' evaluates to {gh_event == 'workflow_job'}")
         if gh_event is not None and gh_event == 'workflow_job':
             LOGGER.info('inside the if condition')
-            req_body = request.get_json()
+            req_body = json.loads(request.data)
             LOGGER.info(req_body)
             action = req_body['action']
             LOGGER.info(f'action value is {action}')
