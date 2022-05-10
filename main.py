@@ -10,6 +10,7 @@ import random
 import string
 
 from flask import Flask
+from flask import request
 
 fileConfig('logger.cfg')
 LOGGER = logging.getLogger()
@@ -55,7 +56,7 @@ def get_token():
 def cleanup():
     LOGGER.info('cleaning up the instance...')
     global reg_token
-    cleanup_call = subprocess.run(['config.sh', 'remove', '--token', f'{reg_token}'], stdout=subprocess.PIPE)
+    cleanup_call = subprocess.run(['sh', 'config.sh', 'remove', '--token', f'{reg_token}'], stdout=subprocess.PIPE)
     LOGGER.info(cleanup_call.stdout)
     reg_token = None
 
@@ -66,31 +67,40 @@ def setup():
     runner_name_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
     global reg_token
     reg_token = get_token()
-    setup_call = subprocess.run(['config.sh', '--url', organization_url, '--token', reg_token, '--name',
+    setup_call = subprocess.run(['sh', 'config.sh', '--url', organization_url, '--token', reg_token, '--name',
                                  runner_name_prefix + runner_name_suffix, '--unattended', '--ephemeral',
                                  '--work', '_work'], stdout=subprocess.PIPE)
     LOGGER.info(setup_call.stdout)
 
 
 def run():
-    run_call = subprocess.run(['run.sh'], stdout=subprocess.PIPE)
+    run_call = subprocess.run(['sh', 'run.sh'], stdout=subprocess.PIPE)
     LOGGER.info(run_call.stdout)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def start():
-    check_system()
-    setup()
-    run()
-    # cleanup is not necessary for ephemeral setup.
-    # when the job completes, both the .credentials and .runner files are deleted by default.
-    # if you have any specific cleanup tasks to be done, you can include them in the cleanup.
-    cleanup()
-    return 'All Done!', 200
+    if request.method == 'GET':
+        return 'Instance is running...', 200
+    if request.method == 'POST':
+        gh_event = request.headers.get('x-github-event', default=None)
+        if gh_event is not None and gh_event == 'workflow_job':
+            action = request.json['action']
+            if action == 'queued':
+                setup()
+                run()
+                # cleanup is not necessary for ephemeral setup.
+                # when the job completes, both the .credentials and .runner files are deleted by default.
+                # if you have any specific cleanup tasks to be done, you can include them in the cleanup.
+                cleanup()
+                return 'All Done!', 201
+    return 'Unexpected request', 400
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    check_system()
+
     from waitress import serve
 
     serve(app, host='0.0.0.0', port=8080)
