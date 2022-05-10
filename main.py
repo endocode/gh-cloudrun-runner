@@ -86,7 +86,9 @@ def start():
         gh_event = request.headers.get('x-github-event', default=None)
         LOGGER.info(f'gh_event value is {gh_event}')
         if gh_event is not None and gh_event == 'workflow_job':
-            action = request.json['action']
+            req_body = request.get_json()
+            LOGGER.info(req_body)
+            action = req_body['action']
             LOGGER.info(f'action value is {action}')
             if action == 'queued':
                 setup()
