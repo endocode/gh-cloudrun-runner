@@ -36,8 +36,6 @@ reg_token = None
 
 
 def check_system():
-    test_call = subprocess.run(['ls'], shell=True, stdout=subprocess.PIPE)
-    LOGGER.info(test_call.stdout)
     if token is None or organization is None:
         LOGGER.error('GitHub Token and Organization name are required. Cannot proceed without them')
         sys.exit(-1)
@@ -48,11 +46,8 @@ def check_system():
 
 def get_token():
     registration_token_url = f'https://api.github.com/orgs/{organization}/actions/runners/registration-token'
-    headers = {'authorization': f'token ${token}', 'Accept': 'application/vnd.github.v3+json'}
-    LOGGER.info(f'sending a post request to {registration_token_url}')
+    headers = {'authorization': f'token {token}', 'Accept': 'application/vnd.github.v3+json'}
     response = requests.post(url=registration_token_url, headers=headers)
-    LOGGER.info(response.status_code)
-    LOGGER.info(response.text)
     if response.status_code == 201:
         response_json = json.loads(response.text)
         return response_json['token']
@@ -61,7 +56,7 @@ def get_token():
 def cleanup():
     LOGGER.info('cleaning up the instance...')
     global reg_token
-    cleanup_call = subprocess.run(['./config.sh remove --token "{reg_token}"'],
+    cleanup_call = subprocess.run([f'./config.sh remove --token "{reg_token}"'],
                                   shell=True, stdout=subprocess.PIPE)
     LOGGER.info(cleanup_call.stdout)
     reg_token = None
@@ -88,15 +83,9 @@ def start():
         return 'Instance is running...', 200
     if request.method == 'POST':
         gh_event = request.headers.get('x-github-event', default=None)
-        LOGGER.info(f'gh_event value is {gh_event}')
-        LOGGER.info(f'gh_event is not None evaluates to {gh_event is not None}')
-        LOGGER.info(f"gh_event == 'workflow_job' evaluates to {gh_event == 'workflow_job'}")
         if gh_event is not None and gh_event == 'workflow_job':
-            LOGGER.info('inside the if condition')
             req_body = json.loads(request.data)
-            LOGGER.info(req_body)
             action = req_body['action']
-            LOGGER.info(f'action value is {action}')
             if action == 'queued':
                 setup()
                 run()
