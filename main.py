@@ -55,7 +55,7 @@ def get_token():
 def cleanup():
     LOGGER.info('cleaning up the instance...')
     global reg_token
-    cleanup_call = subprocess.run(['config.sh', 'remove', '--token', f'{reg_token}'], stdout=subprocess.PIPE, text=True)
+    cleanup_call = subprocess.run(['config.sh', 'remove', '--token', f'{reg_token}'], stdout=subprocess.PIPE)
     LOGGER.info(cleanup_call.stdout)
     reg_token = None
 
@@ -68,12 +68,12 @@ def setup():
     reg_token = get_token()
     setup_call = subprocess.run(['config.sh', '--url', organization_url, '--token', reg_token, '--name',
                                  runner_name_prefix + runner_name_suffix, '--unattended', '--ephemeral',
-                                 '--work', '_work'], stdout=subprocess.PIPE, text=True)
+                                 '--work', '_work'], stdout=subprocess.PIPE)
     LOGGER.info(setup_call.stdout)
 
 
 def run():
-    run_call = subprocess.run(['run.sh'], stdout=subprocess.PIPE, text=True)
+    run_call = subprocess.run(['run.sh'], stdout=subprocess.PIPE)
     LOGGER.info(run_call.stdout)
 
 
