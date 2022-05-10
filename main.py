@@ -36,6 +36,8 @@ reg_token = None
 
 
 def check_system():
+    test_call = subprocess.run(['ls'], shell=True, stdout=subprocess.PIPE)
+    LOGGER.info(test_call.stdout)
     if token is None or organization is None:
         LOGGER.error('GitHub Token and Organization name are required. Cannot proceed without them')
         sys.exit(-1)
@@ -56,7 +58,8 @@ def get_token():
 def cleanup():
     LOGGER.info('cleaning up the instance...')
     global reg_token
-    cleanup_call = subprocess.run(['sh', 'config.sh', 'remove', '--token', f'{reg_token}'], stdout=subprocess.PIPE)
+    cleanup_call = subprocess.run(['./config.sh', 'remove', '--token', f'{reg_token}'],
+                                  shell=True, stdout=subprocess.PIPE)
     LOGGER.info(cleanup_call.stdout)
     reg_token = None
 
@@ -67,14 +70,14 @@ def setup():
     runner_name_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
     global reg_token
     reg_token = get_token()
-    setup_call = subprocess.run(['sh', 'config.sh', '--url', organization_url, '--token', reg_token, '--name',
+    setup_call = subprocess.run(['./config.sh', '--url', organization_url, '--token', reg_token, '--name',
                                  runner_name_prefix + runner_name_suffix, '--unattended', '--ephemeral',
-                                 '--work', '_work'], stdout=subprocess.PIPE)
+                                 '--work', '_work'], shell=True, stdout=subprocess.PIPE)
     LOGGER.info(setup_call.stdout)
 
 
 def run():
-    run_call = subprocess.run(['sh', 'run.sh'], stdout=subprocess.PIPE)
+    run_call = subprocess.run(['./run.sh'], shell=True, stdout=subprocess.PIPE)
     LOGGER.info(run_call.stdout)
 
 
