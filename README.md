@@ -2,6 +2,9 @@
 
 A shot at running scalable, cost-efficient GitHub self-hosted runners. 
 
+## Architecture
+![architecture](assets/GitHub%20Self-Hosted%20Agent%20Arch.drawio.png)
+
 ## What does it do?
 This can be deployed as a cloud run service, and when the GitHub workflow is triggered and a webhook call is made by GitHub, a cloud run instance is set up as an agent and awaits the job. 
 After the job is completed, the instance is cleaned up and the cloud run service automatically scales down back to 0 (eventually)
