@@ -65,7 +65,7 @@ def cleanup():
 def setup():
     LOGGER.info('setting up the instance...')
     organization_url = f'https://github.com/{organization}'
-    runner_name_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
+    runner_name_suffix = '-' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
     global reg_token
     reg_token = get_token()
     setup_call = subprocess.run([f'./config.sh --url "{organization_url}" --token "{reg_token}" --name "{runner_name_prefix + runner_name_suffix}" --unattended --ephemeral --work _work'], shell=True, stdout=subprocess.PIPE)
@@ -94,7 +94,11 @@ def start():
                 # if you have any specific cleanup tasks to be done, you can include them in the cleanup.
                 cleanup()
                 return 'All Done!', 201
-    return 'Unexpected request', 400
+            else:
+                return 'No Action required unless the action is "queued"', 200
+        else:
+            return 'This service only supports "workflow_job" event', 400
+    return 'Only "GET" and "POST" methods are supported', 400
 
 
 # Press the green button in the gutter to run the script.
