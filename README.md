@@ -33,7 +33,7 @@ Since this is not a native solution, there are some things that might cause conf
   - under variables & secrets tab, create environment variables for "ORGANIZATION" (name of the GitHub Organization) and "NAME" (name prefix for the runners)
   - under variables & secrets tab, reference the previously created GITHUB_ORG_ACCESS_TOKEN as an environment variable named "TOKEN"
   - (Optional) under variables & secrets tab, create environment variable "LOG_LEVEL" to override the level of logging set in the logger.cfg. Acceptable values are ['NOTSET', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL']
-- add a webhook under in your GitHub organization's settings with the payload url as the cloud run service url, content type as "application/json" and "Workflow jobs" selected as events to trigger the webhook.
+- Add a webhook in your GitHub organization's settings with the payload URL set to the Cloud Run service URL, select the content type as 'application/json,' and choose 'Workflow jobs' as the event to trigger the webhook.
 - use `runs-on: self-hosted` in your workflow files to use the agent we just created for running the workflows.
 
 ### Misc
